@@ -2,6 +2,7 @@ import argparse
 import os
 import pandas as pd
 
+from utils.namings import PROCESSED_DATA_FILENAME
 from utils.text_processing import preprocess_dataset, download_nltk_data
 
 
@@ -57,7 +58,7 @@ if __name__ == "__main__":
     df = remove_length_outliers(df)
 
     # Save results
-    output_path = os.path.join(args.output_data_dir, "processed_news.csv")
+    output_path = os.path.join(args.output_data_dir, PROCESSED_DATA_FILENAME)
     df[["title_clean", "text_clean", "title_length", "text_length", "fake"]].to_csv(
         output_path, index=False
     )

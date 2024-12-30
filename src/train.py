@@ -9,7 +9,16 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from scipy.stats import randint
 
+from utils.namings import MODEL_FILENAME, PROCESSED_DATA_FILENAME
 from utils.selectors import LengthSelector, TextSelector
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data-dir", type=str, required=True)
+    parser.add_argument("--model-dir", type=str, required=True)
+    parser.add_argument("--n-iter", type=int, required=True)
+    return parser.parse_args()
 
 
 def optimize_pipeline(df, n_iter=20):
@@ -79,21 +88,13 @@ def optimize_pipeline(df, n_iter=20):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-
-    # SageMaker parameters
-    parser.add_argument("--model-dir", type=str, default=os.environ.get("SM_MODEL_DIR"))
-    parser.add_argument(
-        "--data-dir", type=str, default=os.environ.get("SM_CHANNEL_TRAINING")
-    )
-
-    args = parser.parse_args()
+    args = parse_args()
 
     # Load data from SageMaker path
-    df = pd.read_csv(os.path.join(args.data_dir, "processed_news.csv"))
+    df = pd.read_csv(os.path.join(args.data_dir, PROCESSED_DATA_FILENAME))
     print(df.info())
 
     # Train and save model
-    best_model = optimize_pipeline(df, n_iter=3)
-    model_path = os.path.join(args.model_dir, "model.joblib")
+    best_model = optimize_pipeline(df, n_iter=args.n_iter)
+    model_path = os.path.join(args.model_dir, MODEL_FILENAME)
     joblib.dump(best_model, model_path)

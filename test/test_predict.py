@@ -1,23 +1,17 @@
-import sys
+import requests
 
-sys.path.append("/opt/ml/code")
-import inference
-import json
+# Health check
+response = requests.get("http://localhost:8080/health")
+print(response.json())
 
+# Make prediction
+data = {"title": "Your news title", "text": "Your news content"}
 
-def test_inference():
-    # Load model
-    model = inference.model_fn("/opt/ml/model")
+response = requests.post(
+    "http://localhost:8080/predict",
+    json=data,
+    headers={"Content-Type": "application/json"},
+)
 
-    # Test input
-    test_input = {"title": "Breaking news headline", "text": "Article content here"}
-
-    # Run inference pipeline
-    processed = inference.input_fn(json.dumps(test_input), "application/json")
-    prediction = inference.predict_fn(processed, model)
-    result = inference.output_fn(prediction, "application/json")
-    print(f"Prediction: {result}")
-
-
-if __name__ == "__main__":
-    test_inference()
+prediction = response.json()
+print(prediction)

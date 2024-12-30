@@ -1,14 +1,10 @@
 FROM python:3.11-slim
 
-RUN pip install --no-cache-dir pandas scikit-learn joblib
+RUN pip install --no-cache-dir scikit-learn==1.6.0 pandas==2.2.3
 
 # Copy training code
-COPY src/utils /opt/ml/code/utils
-COPY src/train.py /opt/ml/code/
+COPY src/utils /opt/ml/utils
+COPY src/train.py /opt/ml/
 
-ENV PYTHONUNBUFFERED=TRUE
-ENV PYTHONDONTWRITEBYTECODE=TRUE
-ENV PATH="/opt/ml/code:${PATH}"
-
-WORKDIR /opt/ml/code
+WORKDIR /opt/ml
 ENTRYPOINT ["python", "train.py"]
